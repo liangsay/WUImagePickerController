@@ -11,8 +11,8 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.subspec 'Basic' do |b|
-    b.resources    = "WUImagePickerController/TZImagePickerController/*.{png,bundle}"
-    b.source_files = "WUImagePickerController/TZImagePickerController/*.{h,m}"
+    b.resources    = "TZImagePickerController/TZImagePickerController/*.{png,bundle}"
+    b.source_files = "TZImagePickerController/TZImagePickerController/*.{h,m}"
   end
 
   s.subspec 'Location' do |l|
