@@ -1,4 +1,7 @@
 # TZImagePickerController
+
+### 发布：pod trunk push WUImagePickerController.podspec
+
 ## fix：WUImagePickerController修改自TZImagePickerController支持iOS14以上选视频的问题；作者看到可以留言交流，不知道群在哪里
 [![CocoaPods](https://img.shields.io/cocoapods/v/TZImagePickerController.svg?style=flat)](https://github.com/banchichen/TZImagePickerController)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
