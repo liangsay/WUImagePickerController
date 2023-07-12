@@ -698,7 +698,7 @@ static dispatch_once_t onceToken;
         NSString *outputPath = [self getVideoOutputPath];
 
         // Optimize for network use.
-        session.shouldOptimizeForNetworkUse = true;
+        session.shouldOptimizeForNetworkUse = YES;
         if (!CMTimeRangeEqual(timeRange, kCMTimeRangeZero)) {
             session.timeRange = timeRange;
         }
@@ -730,8 +730,9 @@ static dispatch_once_t onceToken;
         }
 
         // Begin to export video to the output path asynchronously.
+        __weak typeof(self) weakSelf = self;
         [session exportAsynchronouslyWithCompletionHandler:^(void) {
-            [self handleVideoExportResult:session outputPath:outputPath success:success failure:failure];
+            [weakSelf handleVideoExportResult:session outputPath:outputPath success:success failure:failure];
         }];
     } else {
         if (failure) {
@@ -951,39 +952,47 @@ static dispatch_once_t onceToken;
     if ([[NSFileManager defaultManager]fileExistsAtPath:savePath]) {//如果路径有文件，将导致导出失败
         [[NSFileManager defaultManager]removeItemAtPath:savePath error:nil];
     }
-    [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:[self getVideoRequestOptions] resultHandler:^(AVAsset * _Nullable avasset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-        NSError *error;
-        AVURLAsset *avurlasset = (AVURLAsset*) avasset;
-        // Write to documents folder
-
-        NSURL *fileURL = [NSURL fileURLWithPath:savePath];
-        if ([[NSFileManager defaultManager] copyItemAtURL:avurlasset.URL
-                                                    toURL:fileURL
-                                                    error:&error]) {
-            NSLog(@"Copied correctly");
-            if (success) {
-                success(savePath);
-            }
-        }else{
-            if (failure) {
-                failure(@"视频导出失败", error);
-            }
-        }
-    }];
-    //    [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:[self getVideoRequestOptions] exportPreset:presetName resultHandler:^(AVAssetExportSession *_Nullable exportSession, NSDictionary *_Nullable info) {
+    //    [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:[self getVideoRequestOptions] resultHandler:^(AVAsset * _Nullable avasset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+    //        NSError *error;
+    //        AVURLAsset *avurlasset = (AVURLAsset*) avasset;
+    //        // Write to documents folder
     //
-    //
-    //        NSString *outputPath = [self getVideoOutputPath];
-    //        exportSession.outputURL = [NSURL fileURLWithPath:outputPath];
-    //        exportSession.shouldOptimizeForNetworkUse = YES;
-    //        exportSession.outputFileType = AVFileTypeMPEG4;
-    //        if (!CMTimeRangeEqual(timeRange, kCMTimeRangeZero)) {
-    //            exportSession.timeRange = timeRange;
+    //        NSURL *fileURL = [NSURL fileURLWithPath:savePath];
+    //        if ([[NSFileManager defaultManager] copyItemAtURL:avurlasset.URL
+    //                                                    toURL:fileURL
+    //                                                    error:&error]) {
+    //            NSLog(@"Copied correctly");
+    //            if (success) {
+    //                success(savePath);
+    //            }
+    //        }else{
+    //            if (failure) {
+    //                failure(@"视频导出失败", error);
+    //            }
     //        }
-    //        [exportSession exportAsynchronouslyWithCompletionHandler:^{
-    //            [self handleVideoExportResult:exportSession outputPath:outputPath success:success failure:failure];
-    //        }];
     //    }];
+    __weak typeof(self) weakSelf = self;
+    [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:[self getVideoRequestOptions] exportPreset:presetName resultHandler:^(AVAssetExportSession *_Nullable exportSession, NSDictionary *_Nullable info) {
+
+
+        NSString *outputPath = [weakSelf getVideoOutputPath];
+        exportSession.outputURL = [NSURL fileURLWithPath:outputPath];
+        exportSession.shouldOptimizeForNetworkUse = YES;
+        exportSession.outputFileType = AVFileTypeMPEG4;
+        if (!CMTimeRangeEqual(timeRange, kCMTimeRangeZero)) {
+            exportSession.timeRange = timeRange;
+        }else{
+            // 获取视频时长
+//            CMTime aduration = asset.duration;
+//            NSTimeInterval durationInSeconds = CMTimeGetSeconds(aduration);
+            NSLog(@"Video duration: %f seconds", asset.duration);
+            exportSession.timeRange = CMTimeRangeMake(CMTimeMake(0, 1), CMTimeMake(asset.duration, 1));
+        }
+        __weak typeof(weakSelf) strongSelf = weakSelf;
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            [strongSelf handleVideoExportResult:exportSession outputPath:outputPath success:success failure:failure];
+        }];
+    }];
 }
 
 - (void)requestVideoURLWithAsset:(PHAsset *)asset success:(void (^)(NSURL *videoURL))success failure:(void (^)(NSDictionary* info))failure {
@@ -1037,7 +1046,8 @@ static dispatch_once_t onceToken;
 
 - (PHVideoRequestOptions *)getVideoRequestOptions {
     PHVideoRequestOptions* options = [[PHVideoRequestOptions alloc] init];
-    options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+    options.version = PHVideoRequestOptionsVersionOriginal;
+    options.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
     options.networkAccessAllowed = YES;
     return options;
 }
