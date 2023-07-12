@@ -6,8 +6,8 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.author       = { "banchichen" => "tanzhenios@foxmail.com" }
   s.platform     = :ios
-  s.ios.deployment_target = "8.0"
-  s.source       = { :git => "https://github.com/liangsay/WUImagePickerController.git", :branch => "3.8.6" }
+  s.ios.deployment_target = "11.0"
+  s.source       = { :git => "https://github.com/liangsay/WUImagePickerController.git", :tag => "3.8.6" }
   s.requires_arc = true
 
   s.subspec 'Basic' do |b|
