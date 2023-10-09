@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name         = "WUImagePickerController"
-  s.version      = "3.8.6"
+  s.version      = "3.8.7"
   s.summary      = "A clone of UIImagePickerController, support picking multiple photos、original photo and video"
   s.homepage     = "https://github.com/liangsay/WUImagePickerController"
   s.license      = "MIT"
   s.author       = { "banchichen" => "tanzhenios@foxmail.com" }
   s.platform     = :ios
   s.ios.deployment_target = "11.0"
-  s.source       = { :git => "https://github.com/liangsay/WUImagePickerController.git", :tag => "3.8.6" }
+  s.source       = { :git => "https://github.com/liangsay/WUImagePickerController.git", :tag => "3.8.7" }
   s.requires_arc = true
 
   s.subspec 'Basic' do |b|
